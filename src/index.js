@@ -18,6 +18,7 @@ import type { Matcher } from './create-matcher'
 
 import { isNavigationFailure, NavigationFailureType } from './util/errors'
 
+// 入口
 export default class VueRouter {
   static install: () => void
   static version: string
