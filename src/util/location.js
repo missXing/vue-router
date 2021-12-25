@@ -7,6 +7,7 @@ import { fillParams } from './params'
 import { warn } from './warn'
 import { extend } from './misc'
 
+// 根据 raw，current 计算出新的 location
 export function normalizeLocation (
   raw: RawLocation,
   current: ?Route,

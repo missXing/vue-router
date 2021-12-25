@@ -11,9 +11,9 @@ export function createRouteMap (
   oldNameMap?: Dictionary<RouteRecord>,
   parentRoute?: RouteRecord
 ): {
-  pathList: Array<string>,
-  pathMap: Dictionary<RouteRecord>,
-  nameMap: Dictionary<RouteRecord>
+  pathList: Array<string>, // 存储所有的 path
+  pathMap: Dictionary<RouteRecord>, // 一个 path 到 RouteRecord 的映射关系
+  nameMap: Dictionary<RouteRecord> // name 到 RouteRecord 的映射关系
 } {
   // the path list is used to control path matching priority
   const pathList: Array<string> = oldPathList || []
@@ -22,6 +22,7 @@ export function createRouteMap (
   // $flow-disable-line
   const nameMap: Dictionary<RouteRecord> = oldNameMap || Object.create(null)
 
+  // 遍历 routes 为每一个 route 执行 addRouteRecord 方法生成一条记录
   routes.forEach(route => {
     addRouteRecord(pathList, pathMap, nameMap, route, parentRoute)
   })
@@ -89,6 +90,7 @@ function addRouteRecord (
     pathToRegexpOptions.sensitive = route.caseSensitive
   }
 
+  // 创建 RouteRecord
   const record: RouteRecord = {
     path: normalizedPath,
     regex: compileRouteRegex(normalizedPath, pathToRegexpOptions),
@@ -98,10 +100,10 @@ function addRouteRecord (
         ? [route.alias]
         : route.alias
       : [],
-    instances: {},
+    instances: {}, // 组件的实例，也是一个对象类型
     enteredCbs: {},
     name,
-    parent,
+    parent, // 父的 RouteRecord，因为我们配置的时候有时候会配置子路由，所以整个 RouteRecord 也就是一个树型结构。
     matchAs,
     redirect: route.redirect,
     beforeEnter: route.beforeEnter,
@@ -114,6 +116,8 @@ function addRouteRecord (
           : { default: route.props }
   }
 
+  // 如果配置了 children，那么递归执行 addRouteRecord 方法，并把当前的 record 作为 parent 传入，
+  // 通过这样的深度遍历，我们就可以拿到一个 route 下的完整记录
   if (route.children) {
     // Warn if route is named, does not redirect and has a default child route.
     // If users navigate to this route by name, the default child will
@@ -144,6 +148,7 @@ function addRouteRecord (
     })
   }
 
+  // 为 pathList 和 pathMap 各添加一条记录。
   if (!pathMap[record.path]) {
     pathList.push(record.path)
     pathMap[record.path] = record
@@ -177,6 +182,7 @@ function addRouteRecord (
     }
   }
 
+  // 如果我们在路由配置中配置了 name，则给 nameMap 添加一条记录。
   if (name) {
     if (!nameMap[name]) {
       nameMap[name] = record

@@ -43,15 +43,16 @@ export default class VueRouter {
     if (process.env.NODE_ENV !== 'production') {
       warn(this instanceof VueRouter, `Router must be called with the new operator.`)
     }
-    this.app = null
-    this.apps = []
-    this.options = options
+    this.app = null // 根 Vue 实例
+    this.apps = [] // 保存持有 $options.router 属性的 Vue 实例
+    this.options = options // 保存传入的路由配置
     this.beforeHooks = []
     this.resolveHooks = []
     this.afterHooks = []
-    this.matcher = createMatcher(options.routes || [], this)
+    this.matcher = createMatcher(options.routes || [], this) // 路由匹配器
 
     let mode = options.mode || 'hash'
+    // 在浏览器不支持 history.pushState 的情况下，根据传入的 fallback 配置参数，决定是否回退到hash模式
     this.fallback =
       mode === 'history' && !supportsPushState && options.fallback !== false
     if (this.fallback) {
@@ -60,8 +61,11 @@ export default class VueRouter {
     if (!inBrowser) {
       mode = 'abstract'
     }
+    // this.mode 表示路由创建的模式
     this.mode = mode
 
+    // this.history 表示路由历史的具体的实现实例，它是根据 this.mode 的不同实现不同，
+    // 它有 History 基类，然后不同的 history 实现都是继承 History
     switch (mode) {
       case 'history':
         this.history = new HTML5History(this, options.base)
@@ -95,6 +99,7 @@ export default class VueRouter {
           `before creating root instance.`
       )
 
+    // 只有根 Vue 实例会保存到 this.app 中
     this.apps.push(app)
 
     // set up app destroyed handler
@@ -118,6 +123,7 @@ export default class VueRouter {
 
     this.app = app
 
+    // 拿到当前的 this.history，根据它的不同类型来执行不同逻辑
     const history = this.history
 
     if (history instanceof HTML5History || history instanceof HashHistory) {
@@ -134,6 +140,7 @@ export default class VueRouter {
         history.setupListeners()
         handleInitialScroll(routeOrError)
       }
+      // src/history/base.js
       history.transitionTo(
         history.getCurrentLocation(),
         setupListeners,
@@ -284,6 +291,8 @@ function createHref (base: string, fullPath: string, mode) {
   return base ? cleanPath(base + '/' + path) : path
 }
 
+// 实现了 install 的静态方法
+// 当用户执行 Vue.use(VueRouter) 的时候，实际上就是在执行 install 函数
 VueRouter.install = install
 VueRouter.version = '__VERSION__'
 VueRouter.isNavigationFailure = isNavigationFailure

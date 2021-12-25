@@ -5,11 +5,13 @@ import { warn } from './warn'
 import { isError } from '../util/errors'
 
 export function resolveAsyncComponents (matched: Array<RouteRecord>): Function {
+  // 返回的是一个导航守卫函数
   return (to, from, next) => {
     let hasAsync = false
     let pending = 0
     let error = null
 
+    // 利用了 flatMapComponents 方法从 matched 中获取到每个组件的定义
     flatMapComponents(matched, (def, _, match, key) => {
       // if it's a function and doesn't have cid attached,
       // assume it's an async component resolve function.

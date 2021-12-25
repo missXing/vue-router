@@ -20,8 +20,12 @@ export function createMatcher (
   routes: Array<RouteConfig>,
   router: VueRouter
 ): Matcher {
+  // 创建一个路由映射表
   const { pathList, pathMap, nameMap } = createRouteMap(routes)
 
+  // 动态添加路由配置
+  // 再次调用 createRouteMap 即可，传入新的 routes 配置，由于 pathList、pathMap、nameMap 都是引用类型，
+  // 执行 addRoutes 后会修改它们的值
   function addRoutes (routes) {
     createRouteMap(routes, pathList, pathMap, nameMap)
   }
@@ -48,11 +52,13 @@ export function createMatcher (
     return pathList.map(path => pathMap[path])
   }
 
+  // 根据传入的 raw 和当前的路径 currentRoute 计算出一个新的路径并返回
   function match (
-    raw: RawLocation,
-    currentRoute?: Route,
-    redirectedFrom?: Location
+    raw: RawLocation, // 可以是一个 url 字符串，也可以是一个 Location 对象
+    currentRoute?: Route, // 表示当前的路径
+    redirectedFrom?: Location // 和重定向相关
   ): Route {
+    // 根据 raw，current 计算出新的 location
     const location = normalizeLocation(raw, currentRoute, false, router)
     const { name } = location
 

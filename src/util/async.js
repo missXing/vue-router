@@ -1,5 +1,6 @@
 /* @flow */
-
+// 这是一个非常经典的异步函数队列化执行的模式
+// queue 是一个 NavigationGuard 类型的数组
 export function runQueue (queue: Array<?NavigationGuard>, fn: Function, cb: Function) {
   const step = index => {
     if (index >= queue.length) {
